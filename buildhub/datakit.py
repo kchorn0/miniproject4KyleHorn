@@ -9,6 +9,9 @@ tests as you go:  pytest tests/public
 """
 from __future__ import annotations
 
+import csv  # standard-library CSV reader (gives us csv.DictReader)
+import json  # standard-library JSON parser
+
 
 def load_records(path):
     """Load a .csv or .json file into a list of dict rows.
@@ -17,13 +20,38 @@ def load_records(path):
     - .json -> a list of objects (returned as-is)
     - anything else -> raise ValueError
     """
-    raise NotImplementedError
+    # str() lets callers pass a pathlib.Path too; lower() makes ".CSV" work like ".csv"
+    name = str(path).lower()
+
+    if name.endswith(".csv"):
+        # newline="" is what the csv module docs require so quoted line breaks parse correctly;
+        # utf-8 makes the result the same on Windows and macOS/Linux
+        with open(path, newline="", encoding="utf-8") as f:
+            # DictReader uses the header row as keys; each row becomes a dict of strings.
+            # list() reads every row now, before the with-block closes the file.
+            return list(csv.DictReader(f))
+
+    if name.endswith(".json"):
+        with open(path, encoding="utf-8") as f:
+            # The file holds a list of objects; json.load returns it with JSON types kept
+            # (numbers stay int/float, not strings), so we return it as-is.
+            return json.load(f)
+
+    # Any other extension is not supported, per the spec
+    raise ValueError(f"Unsupported file type (expected .csv or .json): {path}")
 
 
 def filter_records(records, **criteria):
     """Return only the rows where, for every field=value pair passed as a keyword
     argument, str(row[field]) == str(value)."""
-    raise NotImplementedError
+    # Keep a row only if ALL criteria match. all() of an empty criteria dict is True,
+    # so calling with no criteria returns every row. Comparing as str() means a JSON
+    # int 3 matches the criterion "3", and a CSV "3" matches the criterion 3.
+    return [
+        row
+        for row in records
+        if all(str(row[field]) == str(value) for field, value in criteria.items())
+    ]
 
 
 def summarize(records, group_by, value, agg, decimals=2):
