@@ -1,3 +1,6 @@
+# INF601 - Advanced Programming in Python
+# Kyle Horn
+# Mini Project 4
 """datakit — a tiny data-processing toolkit.
 
 YOUR JOB: implement every function below so it matches SPEC.md. Drive Claude Code

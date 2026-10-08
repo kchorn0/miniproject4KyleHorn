@@ -1,3 +1,6 @@
+# INF601 - Advanced Programming in Python
+# Kyle Horn
+# Mini Project 4
 """Public smoke tests — run these as you build:  pytest tests/public
 
 These are a SUBSET of what the instructor's grader checks (the grader also varies
