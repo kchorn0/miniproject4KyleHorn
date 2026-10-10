@@ -1,11 +1,11 @@
 # INF601 - Advanced Programming in Python
 # Kyle Horn
 # Mini Project 4
-"""datakit — a tiny data-processing toolkit.
+"""datakit — a tiny data-processing toolkit (Build Hub spec, standard library only).
 
-YOUR JOB: implement every function below so it matches SPEC.md. Drive Claude Code
-to help, but you must understand and be able to explain each line. Run the public
-tests as you go:  pytest tests/public
+Five functions: load_records (read .csv/.json), filter_records (keep matching rows),
+summarize (group + count/sum/mean/min/max), top_n (largest rows first), and
+to_report (sorted "key: value" text). Tests:  pytest  (public)  /  pytest tests  (all)
 """
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ def load_records(path):
     if name.endswith(".csv"):
         # newline="" is what the csv module docs require so quoted line breaks parse correctly.
         # utf-8-sig reads normal UTF-8 the same as utf-8, but also strips the hidden BOM bytes
-        # Excel/Notepad may add at the start; otherwise the first key would be '﻿name'.
+        # Excel/Notepad may add at the start; otherwise the first key would be '\ufeffname'.
         with open(path, newline="", encoding="utf-8-sig") as f:
             # DictReader uses the header row as keys; each row becomes a dict of strings.
             # list() reads every row now, before the with-block closes the file.

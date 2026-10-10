@@ -81,7 +81,7 @@ def test_csv_with_bom(tmp_path):
     HOW:   Save a file using encoding="utf-8-sig" (that adds the BOM), then load it."""
     path = tmp_path / "bom.csv"  # a temporary file
     path.write_text("name,points\nAna,10\n", encoding="utf-8-sig")  # save WITH a BOM, like Excel
-    assert dk.load_records(path)[0]["name"] == "Ana"  # key is "name", not "﻿name"
+    assert dk.load_records(path)[0]["name"] == "Ana"  # key is "name", not "\ufeffname"
 
 
 def test_json_with_bom(tmp_path):

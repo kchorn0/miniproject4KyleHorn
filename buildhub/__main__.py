@@ -1,8 +1,11 @@
 # INF601 - Advanced Programming in Python
 # Kyle Horn
 # Mini Project 4
-"""buildhub CLI.  Implement so:  python -m buildhub summarize <file> --group-by G --value V --agg A
-and:  python -m buildhub top <file> --key K --n N   both work (see SPEC.md)."""
+"""buildhub command-line interface. Usage:
+
+    python -m buildhub summarize <file> --group-by G --value V --agg A [--decimals D]
+    python -m buildhub top <file> --key K --n N
+"""
 import argparse  # standard-library tool that reads command-line options like --key
 import sys  # gives us sys.exit to hand main()'s return code back to the shell
 
