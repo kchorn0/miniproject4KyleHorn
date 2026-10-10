@@ -11,6 +11,10 @@ from __future__ import annotations
 
 import csv  # standard-library CSV reader (gives us csv.DictReader)
 import json  # standard-library JSON parser
+import statistics  # standard-library math helpers (we use statistics.mean)
+
+# The aggregations summarize() accepts; anything else is a ValueError
+AGGREGATES = {"count", "sum", "mean", "min", "max"}
 
 
 def load_records(path):
@@ -70,7 +74,41 @@ def summarize(records, group_by, value, agg, decimals=2):
       "max"   -> largest value (float)
     Return a dict mapping each group value to its aggregate. Unknown agg -> ValueError.
     """
-    raise NotImplementedError
+    # Check agg FIRST, so a bad agg raises ValueError even if records is empty
+    if agg not in AGGREGATES:
+        raise ValueError(f"Unknown agg {agg!r}; expected one of {sorted(AGGREGATES)}")
+
+    # groups maps each group value to the list of that group's rows,
+    # e.g. {"red": [Ana_row, Cy_row, Eve_row], "blue": [Ben_row, Dee_row]}
+    groups = {}
+    for row in records:
+        # setdefault creates an empty list the first time we see a group, then we append to it
+        groups.setdefault(row[group_by], []).append(row)
+
+    # Build the result one group at a time; dicts keep insertion order,
+    # so groups appear in the order they first show up in the data
+    result = {}
+    for group, rows in groups.items():
+        if agg == "count":
+            # count only needs the number of rows (an int), so we never touch the value field
+            result[group] = len(rows)
+            continue
+        # Every other agg is math, so turn each value into a float first
+        # (CSV values arrive as strings like "10"; JSON values may be ints)
+        numbers = [float(row[value]) for row in rows]
+        if agg == "sum":
+            # sum() of floats is already a float, e.g. 10.0 + 30.0 + 55.0 = 95.0
+            result[group] = sum(numbers)
+        elif agg == "mean":
+            # statistics.mean gives the average; round() trims it to `decimals` places
+            result[group] = round(statistics.mean(numbers), decimals)
+        elif agg == "min":
+            # smallest float in the group
+            result[group] = min(numbers)
+        else:  # agg == "max" (the only option left after the check at the top)
+            # largest float in the group
+            result[group] = max(numbers)
+    return result
 
 
 def top_n(records, key, n):
