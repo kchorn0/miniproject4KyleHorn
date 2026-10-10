@@ -113,10 +113,20 @@ def summarize(records, group_by, value, agg, decimals=2):
 
 def top_n(records, key, n):
     """Return the `n` rows with the largest numeric `key`, sorted descending."""
-    raise NotImplementedError
+    # Sort by the key's NUMBER, not its text: as strings "100" < "55" because "1" < "5".
+    # reverse=True puts the biggest first. Python's sort is stable, so rows with tied
+    # values keep their original file order.
+    ranked = sorted(records, key=lambda row: float(row[key]), reverse=True)
+    # Slice off the first n rows; slicing past the end just returns every row.
+    # max(n, 0) makes a negative n return [] instead of slicing from the end.
+    return ranked[: max(n, 0)]
 
 
 def to_report(summary):
     """Render a {key: value} dict as lines 'key: value', one per line, sorted
     ascending by key, joined with '\\n' (no trailing newline)."""
-    raise NotImplementedError
+    # sorted(summary) sorts just the dict's keys A->Z (only keys are compared, never values).
+    # Each key becomes one "key: value" line, with the value shown via str() as the spec says.
+    lines = [f"{k}: {str(summary[k])}" for k in sorted(summary)]
+    # join puts "\n" BETWEEN lines only, so there is no trailing newline
+    return "\n".join(lines)
