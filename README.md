@@ -246,5 +246,3 @@ re-runs (max 3 tries, then asks me) → I review → I commit.
 
 **What was not AI-verified:** the hidden autograder. The public tests (7/7) and our extra
 tests (36/36) pass, but the hidden checks can only be confirmed by the instructor.
-
-I reviewed all AI-generated code and can explain every line.
