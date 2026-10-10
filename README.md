@@ -95,6 +95,12 @@ Windows (PowerShell):
 ```
 .\.venv\Scripts\Activate.ps1
 ```
+If PowerShell blocks this with a "running scripts is disabled on this system" error, either
+run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once (in your own PowerShell, as
+yourself) and try again, or skip activation and call the venv's Python directly in every
+command below, e.g. `.\.venv\Scripts\python.exe -m pytest` and
+`.\.venv\Scripts\python.exe -m buildhub ...`.
+
 Linux/macOS (bash):
 ```
 source .venv/bin/activate
@@ -172,8 +178,9 @@ required header was added).
 
 ## Help
 
-* **`ModuleNotFoundError: No module named 'pytest'`** — the venv isn't activated or the
-  packages weren't installed. Re-run steps 3 and 4 of Installing.
+* **`The term 'pytest' is not recognized...`** (PowerShell), **`pytest: command not found`**
+  (bash), or **`No module named pytest`** (when using `python -m pytest`) — the venv isn't
+  activated or the packages weren't installed. Re-run steps 3 and 4 of Installing.
 * **`No module named buildhub`** — you're not in the project's root folder. `cd` into
   `miniproject4KyleHorn` (the folder that contains `buildhub/`) and try again.
 * **`running scripts is disabled on this system`** (Windows only) — PowerShell is blocking
