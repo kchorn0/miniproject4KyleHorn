@@ -24,15 +24,17 @@ def load_records(path):
     name = str(path).lower()
 
     if name.endswith(".csv"):
-        # newline="" is what the csv module docs require so quoted line breaks parse correctly;
-        # utf-8 makes the result the same on Windows and macOS/Linux
-        with open(path, newline="", encoding="utf-8") as f:
+        # newline="" is what the csv module docs require so quoted line breaks parse correctly.
+        # utf-8-sig reads normal UTF-8 the same as utf-8, but also strips the hidden BOM bytes
+        # Excel/Notepad may add at the start; otherwise the first key would be '﻿name'.
+        with open(path, newline="", encoding="utf-8-sig") as f:
             # DictReader uses the header row as keys; each row becomes a dict of strings.
             # list() reads every row now, before the with-block closes the file.
             return list(csv.DictReader(f))
 
     if name.endswith(".json"):
-        with open(path, encoding="utf-8") as f:
+        # utf-8-sig strips a BOM if present; plain json.load would fail with "Unexpected UTF-8 BOM"
+        with open(path, encoding="utf-8-sig") as f:
             # The file holds a list of objects; json.load returns it with JSON types kept
             # (numbers stay int/float, not strings), so we return it as-is.
             return json.load(f)
@@ -41,7 +43,10 @@ def load_records(path):
     raise ValueError(f"Unsupported file type (expected .csv or .json): {path}")
 
 
-def filter_records(records, **criteria):
+# The "/" makes `records` positional-only, so a data field that happens to be named
+# "records" can still be used as a criterion: filter_records(rows, records="x").
+# Without it, Python raises TypeError: "got multiple values for argument 'records'".
+def filter_records(records, /, **criteria):
     """Return only the rows where, for every field=value pair passed as a keyword
     argument, str(row[field]) == str(value)."""
     # Keep a row only if ALL criteria match. all() of an empty criteria dict is True,
