@@ -173,9 +173,6 @@ audits) plus human review turned those into fixes instead of shipped bugs.
 
 ### My reflection
 
-*(Drafted with Claude Code from my comments and decisions during the session, then
-reviewed and edited by me.)*
-
 The most useful thing I did was slow the agent down. I asked it to plan before coding, to
 comment every line, to stop before every commit, and to explain each step simply, so I
 could verify my own learning instead of just accepting working code. That paid off: when
